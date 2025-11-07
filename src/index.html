@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<notebook theme="glacier">
+  <title>Dead and Missing Migrants</title>
+
+  0 - BUILD TIME (R SCRIPT)
+
+  <script type="text/x-r" hidden>
+    source("../data/build.R")
+  </script>
+
+  1 - LIBRARIES
+
+  <script id="imports" type="module" hidden>
+    const viz = import("geoviz");
+  </script>
+
+  PARAMS
+
+  <script id="imports" type="module" hidden>
+    const yearmin = 1993;
+    const yearmax = new Date().getFullYear();
+    const lang = "fr"; // "en" or "fr"
+  </script>
+
+  2 - DATA LOADING
+
+  <script type="module" hidden>
+    let data = await FileAttachment("../data/data.csv").csv();
+    let land = await FileAttachment("../data/land.json").json();
+    let eu = await FileAttachment("../data/eu.json").json();
+    let schengen = await FileAttachment("../data/schengen.json").json();
+    let toponymes = await FileAttachment("../data/toponymes.json").json();
+  </script>
+
+  SOME TEXTS TO DISPLAY
+
+  <script type="module" hidden>
+    let source1 = "UNITED for Intercultural\nAction (1993-1999)";
+    let source2 = `The "Migrants Files" project\n(2000 - 2013)`;
+    let source3 =
+      lang == "en"
+        ? "International Organization\nfor Migration\n(2014 to now)"
+        : "Organisation Internationale\npour les Migrations\n(2014 à aujourd'hui)";
+
+    let source =
+      lang == "en"
+        ? "Map design\nNicolas Lambert, 2025"
+        : "Cartographie\nNicolas Lambert, 2025\n";
+
+    if (yearmin < 2000) {
+      source += "\n" + source1;
+    }
+    if (yearmin <= 2013 && yearmax >= 2000) {
+      source += "\n" + source2;
+    }
+    if (yearmax >= 2014) {
+      source += "\n" + source3;
+    }
+  </script>
+
+  3 - MAP VISUALIZATION
+
+  <script type="module" hidden>
+    let svg = viz.create({
+      projection: "AzimuthalEqualArea.rotate([-20,-52])",
+      domain: [
+        [-25, 19],
+        [42, 55],
+      ],
+      margin: 20,
+      background: "#bde1f0",
+    });
+
+    svg.graticule({ type: "graticule", id: "graticule", stroke: "white" });
+    svg.plot({
+      data: land,
+      id: "countries",
+      fill: "#E6DED4",
+      strokeWidth: 0.3,
+    });
+
+    svg.plot({
+      datum: eu,
+      fill: "#E2BD93",
+      id: "eu27",
+      strokeWidth: 0.5,
+      filter: svg.effect.shadow({
+        stdDeviation: 2,
+        fill: "black",
+        fillOpacity: 0.2,
+        dx: 2,
+        dy: 2,
+      }),
+    });
+    svg.path({
+      datum: schengen,
+      id: "schengen",
+      stroke: "#383333",
+      strokeDasharray: [5, 3],
+      strokeOpacity: 0.5,
+      strokeWidth: 1.4,
+      filter: svg.effect.shadow({
+        stdDeviation: 1,
+        fill: "black",
+        fillOpacity: 0.5,
+        dx: 1,
+        dy: 1,
+      }),
+    });
+    svg.scalebar({
+      id: "scale",
+      units: "km",
+      label: "Kilomètres",
+    });
+    svg.header({
+      text: "Des morts par milliers aux portes de l'Europe",
+      id: "header",
+      background_fill: "#454545",
+      fill: "white",
+    });
+    toponymes.forEach((d) => {
+      svg.text({
+        id: d.id,
+        pointerEvents: "none",
+        coords: "geo",
+        pos: [d.pos[1], d.pos[0]],
+        text: d.fr,
+        textAnchor: d.anchor,
+        fill: d.fill || "#454545",
+        fillOpacity: d.fillOpacity || 1,
+        fontWeight: "bold",
+        strokeWidth: d.strokeWidth,
+        strokeOpacity: d.strokeOpacity || 0.7,
+        fontSize: d.fontSize,
+        stroke: d.stroke || "white",
+      });
+    });
+    svg.text({
+      pos: [866, 15],
+      textAnchor: "middle",
+      fontSize: 50,
+      fill: "#454545",
+      fontWeight: "bold",
+      text: `${d3
+        .format(",.2r")(d3.sum(data.map((d) => d.nb)))
+        .replace(",", " ")}`,
+      id: "total",
+    });
+    // svg.text({
+    //   pos: [866, 65],
+    //   textAnchor: "middle",
+    //   fontSize: 14,
+    //   fill: "#454545",
+    //   stroke: "#E6DED4",
+    //   strokeWidth: 4,
+    //   text: `C'est le nombre de personnes\nmigrantes mortes ou portées\ndisparues en essayant de\nrejoindre l'Union européenne\nentre ${yearmin} et ${yearmax}.\n\nDit autrement, ce sont\n${nbbyweek} femmes, hommes\net enfants qui perdent\nla vie chaque semaine.`,
+    //   id: "total2",
+    // });
+    svg.text({
+      text: source,
+      pos: [svg.width - 15, 450],
+      textAnchor: "end",
+      fontSize: 10,
+      fill: "#76858C",
+      fillOpacity: 0.7,
+      fontStyle: "italic",
+      textDominantBaseline: "hanging",
+      id: "source",
+    });
+    display(svg.render());
+  </script>
+</notebook>
