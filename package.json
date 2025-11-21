@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "@observablehq/notebook-kit": "^1.5.0",
+    "@turf/clusters": "^7.3.0",
+    "@turf/clusters-dbscan": "^7.3.0",
+    "d3-array": "^3.2.4",
     "geotoolbox": "^3.0.4",
     "geoviz": "^0.9.4"
   },

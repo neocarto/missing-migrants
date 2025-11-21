@@ -11,4 +11,4 @@ resp <- GET(
 stop_for_status(resp)
 csv_text <- content(resp, "text", encoding = "UTF-8")
 df <- read.csv(text = csv_text, stringsAsFactors = FALSE)
-write.csv(df, "./Sources/IOM/Missing_Migrants_Global_Figures_allData.csv", row.names = FALSE)
+write.csv(df, "../data/Sources/IOM/Missing_Migrants_Global_Figures_allData.csv", row.names = FALSE)
