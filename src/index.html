@@ -2,13 +2,13 @@
 <notebook theme="glacier">
   <title>Dead and Missing Migrants</title>
 
-  0 - BUILD TIME (R SCRIPT)
+  BUILD TIME (R SCRIPT)
 
   <script type="text/x-r" hidden>
     source("../data/build.R")
   </script>
 
-  1 - LIBRARIES & HELPERS
+  LIBRARIES & HELPERS
 
   <script id="imports" type="module" hidden>
     import { formatDateFR } from "./helpers/formatDateFR.js";
@@ -26,7 +26,7 @@
     const lang = "fr"; // "en" or "fr"
   </script>
 
-  2 - DATA LOADING
+  DATA LOADING
 
   <script type="module" hidden>
     let data = await FileAttachment("../data/data.csv").csv();
@@ -69,9 +69,6 @@
       features.push(clustering(toGeoJSON(mycateg), 20, categ).features);
     });
     let clusters = { type: "FeatureCollection", features: features.flat() };
-
-    display(clusters);
-    display(categories);
   </script>
 
   SOME TEXTS TO DISPLAY
@@ -100,7 +97,7 @@
     }
   </script>
 
-  3 - MAP VISUALIZATION
+  MAP VISUALIZATION
 
   <script type="module" hidden>
     let svg = viz.create({
@@ -112,6 +109,7 @@
       margin: 20,
       background: "#bde1f0",
       responsive: true,
+      zoomable: false,
     });
 
     svg.graticule({ type: "graticule", id: "graticule", stroke: "white" });
@@ -143,6 +141,10 @@
       var2: "type",
       colors: types.map((d) => d.color),
       k: 75,
+      tip: (d) =>
+        `${d.properties.type}\n ${d.properties.nb} personne${
+          d.properties.nb > 1 ? "s" : ""
+        }`,
       stroke: "white",
       strokeWidth: 0.2,
       leg2_rect_width: 15,
@@ -243,9 +245,17 @@
 
   <script type="text/markdown">
     Ajouter boutons télécharger ne png et en svg
+
+    Eliminer les données hors du cadre géographique
+
+    Ajouter Loes logo RIATE, CNRS ET MIGREUROP
+
+    Ajouter le logo creative commons
+
+    Et sous la carte, un petit texte methodo et politique.
   </script>
 
-  4 - SOURCES
+  SOURCES
 
   <script type="text/markdown">
     Nicolas Lambert<br/>CNRS, RIATE - Centre pour l'analyse spatiale et la géovisualisation<br/>
