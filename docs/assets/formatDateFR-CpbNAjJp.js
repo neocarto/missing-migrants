@@ -1,0 +1,1 @@
+function m(e){const r=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],[t,o,a]=e.split("-").map(Number);return`${a} ${r[o-1]} ${t}`}export{m as formatDateFR};

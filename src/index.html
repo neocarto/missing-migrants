@@ -1,11 +1,17 @@
 <!DOCTYPE html>
+
 <notebook theme="glacier">
   <title>Dead and Missing Migrants</title>
-
-  BUILD TIME (R SCRIPT)
+  BUILD SCRIPT IN R
 
   <script type="text/x-r" hidden>
     source("../data/build.R")
+  </script>
+
+  CSS
+
+  <script type="text/markdown">
+    <link rel="stylesheet" href="./style.css" />
   </script>
 
   LIBRARIES & HELPERS
@@ -29,7 +35,7 @@
   DATA LOADING
 
   <script type="module" hidden>
-    let data = await FileAttachment("../data/data.csv").csv();
+    let all = await FileAttachment("../data/data.csv").csv();
     let land = await FileAttachment("../data/land.json").json();
     let eu = await FileAttachment("../data/eu.json").json();
     let schengen = await FileAttachment("../data/schengen.json").json();
@@ -57,6 +63,38 @@
         color: "#637A84",
       },
     ];
+  </script>
+
+  SVG CONTAINER
+
+  <script type="module" hidden>
+    let svg = viz.create({
+      projection: "AzimuthalEqualArea.rotate([-20,-52])",
+      domain: [
+        [-25, 19],
+        [42, 55],
+      ],
+      margin: 20,
+      background: "#bde1f0",
+      responsive: true,
+      zoomable: true,
+    });
+  </script>
+
+  FILTER
+
+  <script type="module" hidden>
+    const check = new Map(
+      viz.tool
+        .project(viz.tool.featurecollection(all, { lat: "lat", lon: "lng" }), {
+          projection: svg.projection,
+        })
+        .features.map((d) => [d.properties.id, d.geometry?.coordinates])
+    );
+  </script>
+
+  <script type="module" hidden>
+    let data = all.filter((d) => Array.isArray(check.get(d.id)));
   </script>
 
   CLUSTERING
@@ -97,21 +135,18 @@
     }
   </script>
 
+  <script type="module" hidden>
+    let update = new Date(date);
+    let Difference_In_Time =
+      update.getTime() - new Date(`${yearmin}-01-01`).getTime();
+    const days = Math.round(Difference_In_Time / (1000 * 3600 * 24));
+    const weeks = days / 7;
+    const nbbyweek = Math.round(d3.sum(data.map((d) => d.nb)) / weeks);
+  </script>
+
   MAP VISUALIZATION
 
   <script type="module" hidden>
-    let svg = viz.create({
-      projection: "AzimuthalEqualArea.rotate([-20,-52])",
-      domain: [
-        [-25, 19],
-        [42, 55],
-      ],
-      margin: 20,
-      background: "#bde1f0",
-      responsive: true,
-      zoomable: false,
-    });
-
     svg.graticule({ type: "graticule", id: "graticule", stroke: "white" });
     svg.plot({
       data: land,
@@ -217,16 +252,17 @@
         .replace(",", " ")}`,
       id: "total",
     });
-    // svg.text({
-    //   pos: [866, 65],
-    //   textAnchor: "middle",
-    //   fontSize: 14,
-    //   fill: "#454545",
-    //   stroke: "#E6DED4",
-    //   strokeWidth: 4,
-    //   text: `C'est le nombre de personnes\nmigrantes mortes ou portées\ndisparues en essayant de\nrejoindre l'Union européenne\nentre ${yearmin} et ${yearmax}.\n\nDit autrement, ce sont\n${nbbyweek} femmes, hommes\net enfants qui perdent\nla vie chaque semaine.`,
-    //   id: "total2",
-    // });
+
+    svg.text({
+      pos: [866, 65],
+      textAnchor: "middle",
+      fontSize: 14,
+      fill: "#454545",
+      stroke: "#E6DED4",
+      strokeWidth: 4,
+      text: `C'est le nombre de personnes\nmigrantes mortes ou portées\ndisparues en essayant de\nrejoindre l'Union européenne\nentre ${yearmin} et ${yearmax}.\n\nDit autrement, ce sont\n${nbbyweek} femmes, hommes\net enfants qui perdent\nla vie chaque semaine.`,
+    });
+
     svg.text({
       text: source,
       pos: [svg.width - 15, 450],
@@ -241,13 +277,25 @@
     display(svg.render());
   </script>
 
-  TELECHARGER
+  <script type="module">
+    const button_svg = Inputs.button("Télécharger en svg");
+    const button_png = Inputs.button("Télécharger en png");
+    const container = document.createElement("div");
+    container.className = "button-container"; // <-- ici la classe
+    container.append(button_svg);
+    container.append(button_png);
+    display(container);
+    button_svg.addEventListener("click", () => {
+      viz.exportSVG(d3.select(svg.node()));
+    });
+    button_png.addEventListener("click", () => {
+      viz.exportPNG(d3.select(svg.node()));
+    });
+  </script>
 
-  <script type="text/markdown">
-    Ajouter boutons télécharger ne png et en svg
+  TODO
 
-    Eliminer les données hors du cadre géographique
-
+  <script type="text/markdown" hidden>
     Ajouter Loes logo RIATE, CNRS ET MIGREUROP
 
     Ajouter le logo creative commons
@@ -260,5 +308,14 @@
   <script type="text/markdown">
     Nicolas Lambert<br/>CNRS, RIATE - Centre pour l'analyse spatiale et la géovisualisation<br/>
     Dernières mise à jour : ${formatDateFR(date)}
+  </script>
+
+  ROMOVE CELLS
+
+  <script type="module">
+    const cellsToRemove = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 17];
+    for (const id of cellsToRemove) {
+      document.getElementById(`cell-${id}`)?.remove();
+    }
   </script>
 </notebook>

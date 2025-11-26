@@ -1,0 +1,1 @@
+function r(t){return{type:"FeatureCollection",features:t.map(e=>({type:"Feature",properties:{...e},geometry:{type:"Point",coordinates:[parseFloat(e.lng),parseFloat(e.lat)]}}))}}export{r as toGeoJSON};

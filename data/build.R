@@ -138,8 +138,8 @@ mapped_df <- do.call(rbind, lapply(mapped, as.data.frame))
 data <- cbind(data, mapped_df)
 
 # Export
-
-write.csv(data, "../data/data.csv")
+data <- cbind(id = 1:nrow(data), data)
+write.csv(data, "../data/data.csv", row.names = FALSE)
 
 # Date update log
 writeLines(as.character(Sys.Date()), "../data/last_update.txt")
