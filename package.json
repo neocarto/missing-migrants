@@ -5,7 +5,7 @@
     "@turf/clusters-dbscan": "^7.3.0",
     "d3-array": "^3.2.4",
     "geotoolbox": "^3.0.4",
-    "geoviz": "^0.9.4"
+    "geoviz": "^0.9.8"
   },
   "scripts": {
     "preview": "notebooks preview --root src",
