@@ -8,7 +8,7 @@
 
     ## Mise à jour de la carte de Migreurop
 
-    <small>Document réalisé par [Nicolas Lambert](https://neocarto.github.io/cv/) avec Observable Notebooks 2.0<br/>[CNRS](https://www.cnrs.fr/fr) / [UAR RIATE](https://riate.cnrs.fr/) - Centre pour l'analyse spatiale et la géovisualisation<br/>Les cartes de sont générées automatiquement à l'aide de la bibliothèque JavaScript [`geoviz`](https://github.com/riatelab/geoviz).<br/>Dernière mise à jour : <b>${formatDateFR(date)}</b></small><hr/>
+    <small>Document réalisé par [Nicolas Lambert](https://neocarto.github.io/cv/) avec Observable Notebooks 2.0<br/>[CNRS](https://www.cnrs.fr/fr) / [UAR RIATE](https://riate.cnrs.fr/) - Centre pour l'analyse spatiale et la géovisualisation<br/><br/>Les cartes de sont générées automatiquement à l'aide de la bibliothèque JavaScript [**`geoviz`**](https://github.com/riatelab/geoviz).<br/>Deière mise à jour : <b>${formatDateFR(date)}</b></small><hr/>
   </script>
 
   <script type="text/markdown">
@@ -160,37 +160,183 @@
   <script type="text/markdown">
     La première _carte des morts_ a été conçue et produite par **Olivier Clochard** dans les années 2000-2002, et publiée en 2003 dans un numéro des Cahiers d’Outre-Mer ([voir](https://journals.openedition.org/com/865?file=1)). Elle a ensuite été retravaillée et mise à jour avec **Philippe Rekacewicz**, pour une publication dans le Monde Diplomatique en 2006 ([voir](https://www.monde-diplomatique.fr/cartes/mortsauxfrontieres?utm_source=chatgpt.com)). Puis, elle a été retravaillée et mise à jour à nouveau à plusieurs reprises par le réseau **Migreurop** ([voir](https://neocarto.hypotheses.org/files/2017/03/carte_morts_classique.png)).
 
-    La carte présentée ici reprend exactement la même méthodologie.
+    Pour reproduire la carte de Migreurop, plusieurs étapes sont nécessaires :
+
+    - Séparer les données selon la cause du décès (« Noyade », « Suicide », « Asphyxie », « Mort de faim, de soif, de froid ou d’épuisement », « Homicide, torture, absence de soin, violences policières », « Empoisonnement », « Champ de mines, accident, autre »).
+    - Effectuer une agrégation avec DBSCAN pour chaque catégorie (distance = 100).
+    - Assembler l’ensemble des données dans un seul fichier.
+    - Ajouter une légère variation aléatoire aux coordonnées.
+    - Réaliser la carte.
+    - Finaliser l’habillage et la mise en page (labels, couleurs, etc.).
+
+    Et voilà le résultat 🎉🥳
   </script>
 
-  <script type="module">
-    let map = display(migreurop());
+  <script type="module" hidden>
+    let svg = viz.create({
+      projection: "AzimuthalEqualArea.rotate([-20,-52])",
+      domain: [
+        [-25, 19],
+        [42, 55],
+      ],
+      margin: 20,
+      background: "#bde1f0",
+      responsive: true,
+    });
+  </script>
+
+  <script type="module" hidden>
+    svg.graticule({ type: "graticule", id: "graticule", stroke: "white" });
+    svg.plot({
+      data: land,
+      id: "countries",
+      fill: "#E6DED4",
+      strokeWidth: 0.3,
+    });
+
+    svg.plot({
+      datum: eu,
+      fill: "#E2BD93",
+      id: "eu27",
+      strokeWidth: 0.5,
+      filter: svg.effect.shadow({
+        stdDeviation: 2,
+        fill: "black",
+        fillOpacity: 0.2,
+        dx: 2,
+        dy: 2,
+      }),
+    });
+
+    svg.plot({
+      type: "proptypo",
+      data: clusters,
+      var1: "nb",
+      var2: "type",
+      colors: types.map((d) => d.color),
+      k: 75,
+      tip: (d) =>
+        `${d.properties.type}\n ${d.properties.nb} personne${
+          d.properties.nb > 1 ? "s" : ""
+        }`,
+      stroke: "white",
+      strokeWidth: 0.2,
+      leg2_rect_width: 15,
+      leg2_rect_height: 15,
+      leg2_pos: [25, 215],
+      leg2_title: "Cause de la mort",
+      leg2_values_stroke: "#bde1f0",
+      leg2_values_strokeWidth: 14,
+      leg2_values_dx: 8,
+      leg2_values_paintOrder: "stroke",
+      leg2_values_strokeLinejoin: "round",
+      leg1_pos: [20, 20],
+      leg1_values_round: 0,
+      leg1_title: "Nombre de morts",
+      leg1_subtitle: `Du 1er janvier 1993 au ${formatDateFR(date)}`,
+      leg1_title_dy: -5,
+    });
+
+    svg.path({
+      datum: schengen,
+      id: "schengen",
+      stroke: "#383333",
+      strokeDasharray: [5, 3],
+      strokeOpacity: 0.5,
+      strokeWidth: 1.4,
+      filter: svg.effect.shadow({
+        stdDeviation: 1,
+        fill: "black",
+        fillOpacity: 0.5,
+        dx: 1,
+        dy: 1,
+      }),
+    });
+    svg.scalebar({
+      id: "scale",
+      units: "km",
+      label: "Kilomètres",
+    });
+    svg.header({
+      text: "Des morts par milliers aux portes de l'Europe",
+      id: "header",
+      background_fill: "#454545",
+      fill: "white",
+    });
+    toponymes.forEach((d) => {
+      svg.text({
+        id: d.id,
+        pointerEvents: "none",
+        coords: "geo",
+        pos: [d.pos[1], d.pos[0]],
+        text: d.fr,
+        textAnchor: d.anchor,
+        fill: d.fill || "#454545",
+        fillOpacity: d.fillOpacity || 1,
+        fontWeight: "bold",
+        strokeWidth: d.strokeWidth,
+        strokeOpacity: d.strokeOpacity || 0.7,
+        fontSize: d.fontSize,
+        stroke: d.stroke || "white",
+      });
+    });
+    svg.text({
+      pos: [866, 15],
+      textAnchor: "middle",
+      fontSize: 50,
+      fill: "#454545",
+      fontWeight: "bold",
+      text: `${d3
+        .format(",.2r")(d3.sum(data.map((d) => d.nb)))
+        .replace(",", " ")}`,
+      id: "total",
+    });
+
+    svg.text({
+      pos: [866, 65],
+      textAnchor: "middle",
+      fontSize: 14,
+      fill: "#454545",
+      stroke: "#E6DED4",
+      strokeWidth: 4,
+      text: `C'est le nombre de personnes\nmigrantes mortes ou portées\ndisparues en essayant de\nrejoindre l'Union européenne\nentre ${yearmin} et ${yearmax}.\n\nDit autrement, ce sont\n${nbbyweek} femmes, hommes\net enfants qui perdent\nla vie chaque semaine.`,
+    });
+
+    svg.text({
+      text: source,
+      pos: [svg.width - 15, 450],
+      textAnchor: "end",
+      fontSize: 10,
+      fill: "#76858C",
+      fillOpacity: 0.7,
+      fontStyle: "italic",
+      textDominantBaseline: "hanging",
+      id: "source",
+    });
+    display(svg.render());
   </script>
 
   <script type="module">
     const button_svg = Inputs.button("Télécharger en svg");
     const button_png = Inputs.button("Télécharger en png");
     const container = document.createElement("div");
-    container.className = "button-container";
+    container.className = "button-container"; // <-- ici la classe
     container.append(button_svg);
     container.append(button_png);
     display(container);
     button_svg.addEventListener("click", () => {
-      viz.exportSVG(d3.select(map));
+      viz.exportSVG(d3.select(svg.node()));
     });
     button_png.addEventListener("click", () => {
-      viz.exportPNG(d3.select(map));
+      viz.exportPNG(d3.select(svg.node()));
     });
   </script>
 
   <script type="text/markdown">
     ## <ins>Licence</ins>
-  </script>
 
-  <script type="text/markdown">
-    Nicolas Lambert, 2026  
     Distribué sous licence GNU GPL v3.0  
-     https://www.gnu.org/licenses/gpl-3.0.html
+    https://www.gnu.org/licenses/gpl-3.0.html
   </script>
 
   ********** APPENDIX ************
@@ -199,152 +345,11 @@
     source("../data/build.R")
   </script>
 
-  <script type="module" hidden>
-    function migreurop() {
-      let svg = viz.create({
-        projection: "AzimuthalEqualArea.rotate([-20,-52])",
-        domain: [
-          [-25, 19],
-          [42, 55],
-        ],
-        margin: 20,
-        background: "#bde1f0",
-        responsive: true,
-      });
-      svg.graticule({ type: "graticule", id: "graticule", stroke: "white" });
-      svg.plot({
-        data: land,
-        id: "countries",
-        fill: "#E6DED4",
-        strokeWidth: 0.3,
-      });
-
-      svg.plot({
-        datum: eu,
-        fill: "#E2BD93",
-        id: "eu27",
-        strokeWidth: 0.5,
-        filter: svg.effect.shadow({
-          stdDeviation: 2,
-          fill: "black",
-          fillOpacity: 0.2,
-          dx: 2,
-          dy: 2,
-        }),
-      });
-
-      svg.plot({
-        type: "proptypo",
-        data: clusters,
-        var1: "nb",
-        var2: "type",
-        colors: types.map((d) => d.color),
-        k: 75,
-        tip: (d) =>
-          `${d.properties.type}\n ${d.properties.nb} personne${
-            d.properties.nb > 1 ? "s" : ""
-          }`,
-        stroke: "white",
-        strokeWidth: 0.2,
-        leg2_rect_width: 15,
-        leg2_rect_height: 15,
-        leg2_pos: [25, 215],
-        leg2_title: "Cause de la mort",
-        leg2_values_stroke: "#bde1f0",
-        leg2_values_strokeWidth: 14,
-        leg2_values_dx: 8,
-        leg2_values_paintOrder: "stroke",
-        leg2_values_strokeLinejoin: "round",
-        leg1_pos: [20, 20],
-        leg1_values_round: 0,
-        leg1_title: "Nombre de morts",
-        leg1_subtitle: `Du 1er janvier 1993 au ${formatDateFR(date)}`,
-        leg1_title_dy: -5,
-      });
-
-      svg.path({
-        datum: schengen,
-        id: "schengen",
-        stroke: "#383333",
-        strokeDasharray: [5, 3],
-        strokeOpacity: 0.5,
-        strokeWidth: 1.4,
-        filter: svg.effect.shadow({
-          stdDeviation: 1,
-          fill: "black",
-          fillOpacity: 0.5,
-          dx: 1,
-          dy: 1,
-        }),
-      });
-      svg.scalebar({
-        id: "scale",
-        units: "km",
-        label: "Kilomètres",
-      });
-      svg.header({
-        text: "Des morts par milliers aux portes de l'Europe",
-        id: "header",
-        background_fill: "#454545",
-        fill: "white",
-      });
-      toponymes.forEach((d) => {
-        svg.text({
-          id: d.id,
-          pointerEvents: "none",
-          coords: "geo",
-          pos: [d.pos[1], d.pos[0]],
-          text: d.fr,
-          textAnchor: d.anchor,
-          fill: d.fill || "#454545",
-          fillOpacity: d.fillOpacity || 1,
-          fontWeight: "bold",
-          strokeWidth: d.strokeWidth,
-          strokeOpacity: d.strokeOpacity || 0.7,
-          fontSize: d.fontSize,
-          stroke: d.stroke || "white",
-        });
-      });
-      svg.text({
-        pos: [866, 15],
-        textAnchor: "middle",
-        fontSize: 50,
-        fill: "#454545",
-        fontWeight: "bold",
-        text: `${d3
-          .format(",.2r")(d3.sum(data.map((d) => d.nb)))
-          .replace(",", " ")}`,
-        id: "total",
-      });
-
-      svg.text({
-        pos: [866, 65],
-        textAnchor: "middle",
-        fontSize: 14,
-        fill: "#454545",
-        stroke: "#E6DED4",
-        strokeWidth: 4,
-        text: `C'est le nombre de personnes\nmigrantes mortes ou portées\ndisparues en essayant de\nrejoindre l'Union européenne\nentre ${yearmin} et ${yearmax}.\n\nDit autrement, ce sont\n${nbbyweek} femmes, hommes\net enfants qui perdent\nla vie chaque semaine.`,
-      });
-
-      svg.text({
-        text: source,
-        pos: [svg.width - 15, 450],
-        textAnchor: "end",
-        fontSize: 10,
-        fill: "#76858C",
-        fillOpacity: 0.7,
-        fontStyle: "italic",
-        textDominantBaseline: "hanging",
-        id: "source",
-      });
-      return svg.render();
-    }
-  </script>
-
   <script type="text/markdown">
     <link rel="stylesheet" href="./style.css" />
   </script>
+
+  LIBRARIES & HELPERS
 
   <script id="imports" type="module" hidden>
     import { formatDateFR } from "./helpers/formatDateFR.js";
@@ -354,11 +359,15 @@
     const viz = import("geoviz");
   </script>
 
+  PARAMS
+
   <script id="imports" type="module" hidden>
     const yearmin = 1993;
     const yearmax = new Date().getFullYear();
     const lang = "fr"; // "en" or "fr"
   </script>
+
+  DATA LOADING
 
   <script type="module" hidden>
     let all = await FileAttachment("../data/data.csv").csv();
@@ -368,6 +377,8 @@
     let toponymes = await FileAttachment("../data/toponymes.json").json();
     let date = FileAttachment("../data/last_update.txt").text();
   </script>
+
+  CATEGORIES & COLORS
 
   <script type="module" hidden>
     let types = [
@@ -389,6 +400,36 @@
     ];
   </script>
 
+  SVG CONTAINER FILTER
+
+  <script type="module" hidden>
+    const check = new Map(
+      viz.tool
+        .project(viz.tool.featurecollection(all, { lat: "lat", lon: "lng" }), {
+          projection: svg.projection,
+        })
+        .features.map((d) => [d.properties.id, d.geometry?.coordinates]),
+    );
+  </script>
+
+  <script type="module" hidden>
+    let data = all.filter((d) => Array.isArray(check.get(d.id)));
+  </script>
+
+  CLUSTERING
+
+  <script type="module" hidden>
+    let categories = types.map((d) => d.type);
+    let features = [];
+    categories.forEach((categ) => {
+      let mycateg = data.filter((d) => d.fr == categ);
+      features.push(clustering(toGeoJSON(mycateg), 20, categ).features);
+    });
+    let clusters = { type: "FeatureCollection", features: features.flat() };
+  </script>
+
+  SOME TEXTS TO DISPLAY
+
   <script type="module" hidden>
     let source1 = "UNITED for Intercultural\nAction (1993-1999)";
     let source2 = `The "Migrants Files" project\n(2000 - 2013)`;
@@ -399,8 +440,8 @@
 
     let source =
       lang == "en"
-        ? "Map design\nNicolas Lambert, 2025"
-        : "Cartographie\nNicolas Lambert, 2025\n";
+        ? "Map design\nNicolas Lambert, 2026"
+        : "Cartographie\nNicolas Lambert, 2026\n";
 
     if (yearmin < 2000) {
       source += "\n" + source1;
@@ -422,29 +463,7 @@
     const nbbyweek = Math.round(d3.sum(data.map((d) => d.nb)) / weeks);
   </script>
 
-  <script type="module" hidden>
-    const check = new Map(
-      viz.tool
-        .project(viz.tool.featurecollection(all, { lat: "lat", lon: "lng" }), {
-          projection: svg.projection,
-        })
-        .features.map((d) => [d.properties.id, d.geometry?.coordinates]),
-    );
-  </script>
-
-  <script type="module" hidden>
-    let data = all.filter((d) => Array.isArray(check.get(d.id)));
-  </script>
-
-  <script type="module" hidden>
-    let categories = types.map((d) => d.type);
-    let features = [];
-    categories.forEach((categ) => {
-      let mycateg = data.filter((d) => d.fr == categ);
-      features.push(clustering(toGeoJSON(mycateg), 20, categ).features);
-    });
-    let clusters = { type: "FeatureCollection", features: features.flat() };
-  </script>
+  SMALL MULTIPLE
 
   <script type="module">
     function mapByYear({
