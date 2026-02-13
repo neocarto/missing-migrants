@@ -630,7 +630,7 @@
 629,2013,"unknown",36.018776,-5.600819,1,6,"Empoisonnement, Champ de mine, accident, autre","Poisoning, Minefield, accident, other","#637A84"
 630,2013,"drowned",39.671689,26.196498,24,1,"Noyade","drowning","#58ABD3"
 631,2013,"drowned",35.937496,14.375416,31,1,"Noyade","drowning","#58ABD3"
-632,2013,"died (presumably) from ill treatments",37.983716,23.72931,1,NA,NA,NA,NA
+632,2013,"died (presumably) from ill treatments",37.983716,23.72931,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 633,2013,"drowned",35.508622,12.59292,31,1,"Noyade","drowning","#58ABD3"
 634,2013,"drowned",36.799851,27.102943,2,1,"Noyade","drowning","#58ABD3"
 635,2013,"heart failure",53.366786,-2.279768,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
@@ -690,7 +690,7 @@
 689,2012,"frozen",41.244376,26.135943,1,4,"Mort de faim, de soif, de froid ou d'épuisement","Exhaustion, starving, thirst or freezing to death","#1C7532"
 690,2012,"police violence",14.4903,35.8334,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 691,2012,"police violence",32.310059,-9.236617,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
-692,2012,"died (presumably) from ill treatments",35.937496,14.375416,1,NA,NA,NA,NA
+692,2012,"died (presumably) from ill treatments",35.937496,14.375416,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 693,2012,"drowned",39.801,18.356944,1,1,"Noyade","drowning","#58ABD3"
 694,2012,"asphyxiated",43.61583,13.518915,2,3,"Asphyxie","Suffocation","#6B2265"
 695,2012,"drowned",39.801,18.356944,6,1,"Noyade","drowning","#58ABD3"
@@ -742,7 +742,7 @@
 741,2012,"drowned",35.766667,-5.8,89,1,"Noyade","drowning","#58ABD3"
 742,2012,"drowned",35.888384,-5.324636,1,1,"Noyade","drowning","#58ABD3"
 743,2012,"drowned",35.508622,12.59292,11,1,"Noyade","drowning","#58ABD3"
-744,2012,"died (presumably) from ill treatments",51.48309,-0.483529,1,NA,NA,NA,NA
+744,2012,"died (presumably) from ill treatments",51.48309,-0.483529,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 745,2012,"drowned",35.508622,12.59292,2,1,"Noyade","drowning","#58ABD3"
 746,2012,"drowned",35.249299,-3.937112,54,1,"Noyade","drowning","#58ABD3"
 747,2012,"drowned",28.569022,-16.324539,1,1,"Noyade","drowning","#58ABD3"
@@ -1129,7 +1129,7 @@
 1128,2009,"unknown",38.77474,0.08519,2,6,"Empoisonnement, Champ de mine, accident, autre","Poisoning, Minefield, accident, other","#637A84"
 1129,2009,"unknown",38.77474,0.08519,2,6,"Empoisonnement, Champ de mine, accident, autre","Poisoning, Minefield, accident, other","#637A84"
 1130,2009,"drowned",35.508622,12.59292,67,1,"Noyade","drowning","#58ABD3"
-1131,2009,"died (presumably) from ill treatments",41.892916,12.48252,1,NA,NA,NA,NA
+1131,2009,"died (presumably) from ill treatments",41.892916,12.48252,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 1132,2009,"drowned",36.527061,-6.288596,1,1,"Noyade","drowning","#58ABD3"
 1133,2009,"starved",30,30,11,4,"Mort de faim, de soif, de froid ou d'épuisement","Exhaustion, starving, thirst or freezing to death","#1C7532"
 1134,2009,"drowned",37.22813,-6.890386,12,1,"Noyade","drowning","#58ABD3"
@@ -1504,7 +1504,7 @@
 1503,2008,"suicide - hanged",51.35819,4.863547,1,2,"Suicide","Suicide","#F8E91F"
 1504,2008,"suicide - other",55.378051,-3.435973,1,2,"Suicide","Suicide","#F8E91F"
 1505,2008,"drowned",23.69751,-15.93698,4,1,"Noyade","drowning","#58ABD3"
-1506,2008,"died (presumably) from ill treatments",34.686667,-1.911389,7,NA,NA,NA,NA
+1506,2008,"died (presumably) from ill treatments",34.686667,-1.911389,7,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 1507,2008,"suicide - put on fire",49.815273,6.129583,1,2,"Suicide","Suicide","#F8E91F"
 1508,2008,"drowned",35.37849,1.32569,1,1,"Noyade","drowning","#58ABD3"
 1509,2008,"drowned",35.533333,1.016667,1,1,"Noyade","drowning","#58ABD3"
@@ -2944,7 +2944,7 @@
 2943,2001,"unknown",-12.8275,45.166244,1,6,"Empoisonnement, Champ de mine, accident, autre","Poisoning, Minefield, accident, other","#637A84"
 2944,2001,"drowned",36.018776,-5.600819,1,1,"Noyade","drowning","#58ABD3"
 2945,2001,"suicide - jumped from building",48.208174,16.373819,1,2,"Suicide","Suicide","#F8E91F"
-2946,2001,"died (presumably) from ill treatments",38.963745,35.243322,1,NA,NA,NA,NA
+2946,2001,"died (presumably) from ill treatments",38.963745,35.243322,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 2947,2001,"suicide - jumped from building",49.913334,9.292279,1,2,"Suicide","Suicide","#F8E91F"
 2948,2001,"shot by the police",34.802075,38.996815,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 2949,2001,"unknown",36.018776,-5.600819,2,6,"Empoisonnement, Champ de mine, accident, autre","Poisoning, Minefield, accident, other","#637A84"
@@ -3231,7 +3231,7 @@
 3230,2000,"drowned",36.799851,27.102943,9,1,"Noyade","drowning","#58ABD3"
 3231,2000,"drowned",36.527061,-6.288596,5,1,"Noyade","drowning","#58ABD3"
 3232,2000,"unknown",50.767197,13.532895,1,6,"Empoisonnement, Champ de mine, accident, autre","Poisoning, Minefield, accident, other","#637A84"
-3233,2000,"died (presumably) from ill treatments",47.687457,17.650397,1,NA,NA,NA,NA
+3233,2000,"died (presumably) from ill treatments",47.687457,17.650397,1,5,"Homicide, torture, absence de soin, violences policières","Arson, homicide, torture, lack of care, police brutality","#F49919"
 3234,2000,"drowned",35.888384,-5.324636,3,1,"Noyade","drowning","#58ABD3"
 3235,2000,"drowned",49.195098,16.60673,1,1,"Noyade","drowning","#58ABD3"
 3236,2000,"drowned",40.632728,17.941762,1,1,"Noyade","drowning","#58ABD3"

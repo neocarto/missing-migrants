@@ -47,6 +47,10 @@
   </script>
 
   <script type="text/markdown">
+    ${missing_categ}
+  </script>
+
+  <script type="text/markdown">
     ## <ins>Une première visualisation</ins>
   </script>
 
@@ -381,11 +385,22 @@
 
   <script type="module" hidden>
     let all = await FileAttachment("../data/data.csv").csv();
+    let missing = await FileAttachment("../data/missing_causes.csv").csv();
+
     let land = await FileAttachment("../data/land.json").json();
     let eu = await FileAttachment("../data/eu.json").json();
     let schengen = await FileAttachment("../data/schengen.json").json();
     let toponymes = await FileAttachment("../data/toponymes.json").json();
     let date = FileAttachment("../data/last_update.txt").text();
+  </script>
+
+  <script type="module" hidden>
+    let missing_categ =
+      missing.length == 0
+        ? ""
+        : `⚠️ Catégories non affectées : ${missing
+            .map((d) => `"${d.x}"`)
+            .join(", ")} => NA. Modifier le programme R.`;
   </script>
 
   CATEGORIES & COLORS

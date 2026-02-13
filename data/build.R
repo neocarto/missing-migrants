@@ -117,7 +117,7 @@ categories <- list(
 
 map_category <- function(cause_name, categories) {
   for (cat in categories) {
-    if (any(sapply(cat$texts, function(x) grepl(x, cause_name, ignore.case = TRUE)))) {
+    if (any(sapply(cat$texts, function(x) grepl(x, cause_name, ignore.case = TRUE, fixed = TRUE)))) {
       return(list(
         type = cat$type,
         fr = cat$fr,
@@ -144,3 +144,9 @@ write.csv(data, "../data/data.csv", row.names = FALSE)
 
 # Date update log
 writeLines(as.character(Sys.Date()), "../data/last_update.txt")
+
+# Missing
+
+missing_events <- data[is.na(data$type), c("id", "year", "cause", "lat", "lng", "nb")]
+unique_missing_causes <- unique(missing_events$cause)
+write.csv(unique_missing_causes, "../data/missing_causes.csv", row.names = FALSE)
