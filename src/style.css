@@ -1,27 +1,25 @@
 .button-container {
   display: flex;
-  justify-content: flex-start; /* aligne à gauche */
-  align-items: center;
-  gap: 0; /* le gap peut rester à 0 */
+  gap: 0; /* aucun espace ajouté par flex */
 }
 
-/* cible les divs internes créés par Inputs.button */
+/* div internes générés par Inputs.button */
 .button-container > div {
-  display: inline-block !important; /* force les boutons sur la même ligne */
-  margin: 0 !important; /* supprime marges par défaut */
-  padding: 0 !important; /* supprime padding inutile */
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important; /* supprime tout min-width par défaut */
 }
 
 /* bouton réel */
 .button-container button {
-  display: inline-block;
+  margin: 0 !important; /* supprime marge interne du bouton */
+  padding: 8px 14px;
   background: #3a7bd5;
   color: white;
   border: none;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-family: inherit;
   border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
   cursor: pointer;
   transition:
     background 0.2s ease,
