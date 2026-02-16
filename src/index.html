@@ -345,6 +345,63 @@
   </script>
 
   <script type="text/markdown">
+    ## <ins>Voir aussi</ins>
+  </script>
+
+  <script type="text/markdown">
+    D'autres notebooks sur le même thème sur la plateforme [Observable](https://observablehq.com/@neocartocnrs).
+  </script>
+
+  <script type="module">
+    display(
+      previews([
+        {
+          path: "https://observablehq.com/@neocartocnrs/migrants",
+          thumbnail:
+            "c35240210fb884f7c45e68c5f29002f010deac469d4e5747c14b7e89150d9b44",
+          title: "Dead and missing migrants",
+        },
+        {
+          path: "https://observablehq.com/@neocartocnrs/small-multiple",
+          thumbnail:
+            "e1bc6c6fe71901baf591bd8673b1d77e29e2646cac52eeaac790050c9b5cafa3",
+          title: "Small multiple",
+        },
+        {
+          path: "https://observablehq.com/@neocartocnrs/black-lives-matter-in-the-mediterranean",
+          thumbnail:
+            "0e16047575268ab421cc7a6ec9b3002ea0c2dd7adf0503c5099ecdc3043e22df",
+          title: "Black Lives Matter in the Mediterranean",
+        },
+        {
+          path: "https://observablehq.com/@neocartocnrs/dead-and-missing-migrants-2014-2020",
+          thumbnail:
+            "aefd34573928723a8f25c3e03a8ead74cc2c182dafc73da92dbfc7752fcae4b8",
+          title: "Dot cartogram",
+        },
+        {
+          path: "https://observablehq.com/@neocartocnrs/dead-and-missing-migrants",
+          thumbnail:
+            "512495a331754177421fb1e6b32a67fe5ddad13bd97d343fae828f09f672c001",
+          title: "Dead and Missing Migrants in the Mediterranean",
+        },
+        {
+          path: "https://observablehq.com/@neocartocnrs/several-ways-to-represent-dead-and-missing-migrants-in-the-m",
+          thumbnail:
+            "7a50ecb070f74b045fe5e61ea7b9587881770a6e7fe960374c5f33c469556496",
+          title: "Several Ways to Represent Dead and Missing Migrants",
+        },
+        {
+          path: "https://observablehq.com/@neocartocnrs/dead-and-missing-migrants-in-calais",
+          thumbnail:
+            "3527ad35a935b56d185e6a1d04adc38f8a401ffa1cfc626947f9dab7d871da60",
+          title: "Dead and Missing Migrants in Calais",
+        },
+      ]),
+    );
+  </script>
+
+  <script type="text/markdown">
     ## <ins>Licence</ins>
 
     Nicolas Lambert / Migreurop, 2026<br/>
@@ -782,6 +839,32 @@
       });
 
       return svg.render();
+    }
+  </script>
+
+  <script type="module">
+    function preview({ path, title, author = "Observable", thumbnail }) {
+      return htl.html`<a href="${encodeURI(
+        path,
+      )}" target="_blank" title="${title} by ${author}" style="display: inline-flex; flex-direction: column; align-items: start; font: 400 .75rem var(--sans-serif); color: #1b1e23; width: 100%;" onmouseover=${(
+        event,
+      ) =>
+        (event.currentTarget.firstElementChild.style.borderColor =
+          "#1b1e23")} onmouseout=${(event) =>
+        (event.currentTarget.firstElementChild.style.borderColor = "#e8e8e8")}>
+  <div style="border: solid 1px #e8e8e8; border-radius: 4px; box-sizing: border-box; width: 100%; padding-top: 62.5%; background-size: cover; background-image: url(https://static.observableusercontent.com/thumbnail/${encodeURI(
+    thumbnail,
+  )}.jpg);"></div>
+  <div style="width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${title}</div>
+</a>`;
+    }
+  </script>
+
+  <script type="module">
+    function previews(notebooks, size = 160, fontSize) {
+      return htl.html`<div style="display: grid; grid-gap: .875rem; grid-template-columns: repeat(auto-fill, minmax(${size}px, 5fr));">${notebooks.map(
+        preview,
+      )}</div>`;
     }
   </script>
 </notebook>
