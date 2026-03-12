@@ -158,6 +158,80 @@
   </script>
 
   <script type="text/markdown">
+    ## <ins>Lissage</ins></ins>
+  </script>
+
+  <script type="text/markdown">
+    La représentation lissée (méthode `d3.controurDensity`) permet de visualiser les zones où le nombre de décès est le plus élevé, tout en produisant une carte facile à lire. Le paramètre de lissage (`bandwidth`) permet de faire varier le niveau de détail de la carte.
+  </script>
+
+  <script type="module" hidden>
+    const bandwidth = view(
+      Inputs.range([3, 30], {
+        label: "bandwidth",
+        step: 1,
+        value: 10,
+      }),
+    );
+  </script>
+
+  <script type="module" hidden>
+    {
+      let svg = viz.create({
+        projection: d3.geoAzimuthalEqualArea().rotate([-20.0, -52.0]),
+        width,
+        domain: [
+          [-25, 19],
+          [42, 55],
+        ],
+      });
+      svg.plot({ type: "outline" });
+      svg.plot({
+        datum: land,
+        fill: "white",
+      });
+
+      svg.plot({
+        type: "smooth",
+        data: viz.tool.featurecollection(data, { lat: "lat", lon: "lng" }),
+        var: "nb",
+        bandwidth: bandwidth,
+        colors: "Reds",
+        stroke: "white",
+        strokeWidth: 0.2,
+        strokeOpacity: 0.3,
+        thresholds: 50,
+        leg_rect_stroke: "none",
+        leg_rect_height: 4,
+        leg_text_high: "Extrême",
+        leg_text_intermediate: "Elevé",
+        leg_text_low: "Moyen",
+        leg_subtitle: "De 1993 à aujourd'hui",
+        leg_title:
+          "Niveau de\nlétalité\nde la frontière\nmigratoire\neuropéenne",
+      });
+
+      svg.path({
+        datum: schengen,
+        id: "schengen",
+        stroke: "#383333",
+        strokeDasharray: [5, 3],
+        strokeOpacity: 0.5,
+        strokeWidth: 1.4,
+        filter: svg.effect.shadow({
+          stdDeviation: 1,
+          fill: "black",
+          fillOpacity: 0.5,
+          dx: 1,
+          dy: 1,
+        }),
+      });
+
+      display(svg.render());
+    }
+  </script>
+
+  <script type="text/markdown">
     ## <ins>La carte des morts de Migreurop</ins></ins>
   </script>
 
