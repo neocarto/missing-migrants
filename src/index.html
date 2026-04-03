@@ -8,7 +8,7 @@
 
     ## Mise à jour de la carte de Migreurop
 
-    <small>Document réalisé par [Nicolas Lambert](https://neocarto.github.io/cv/) avec Observable Notebooks 2.0<br/>[CNRS](https://www.cnrs.fr/fr) / [UAR RIATE](https://riate.cnrs.fr/) - Centre pour l'analyse spatiale et la géovisualisation<br/>Les cartes de sont générées automatiquement à l'aide de la bibliothèque JavaScript [**`geoviz`**](https://github.com/riatelab/geoviz).<br/>Dernière mise à jour : <b>${formatDateFR(date)}</b></small><hr/>
+    <small>Document réalisé par [Nicolas Lambert](https://neocarto.github.io/cv/) avec Observable Notebooks 2.0<br/>[CNRS](https://www.cnrs.fr/fr) / [UAR RIATE](https://riate.cnrs.fr/) - Centre pour l'analyse spatiale et la géovisualisation<br/>Les cartes sont générées automatiquement à l'aide de la bibliothèque JavaScript [**`geoviz`**](https://github.com/riatelab/geoviz).<br/>Dernière mise à jour : <b>${formatDateFR(date)}</b></small><hr/>
   </script>
 
   <script type="text/markdown">
@@ -411,6 +411,18 @@
   </script>
 
   <script type="text/markdown">
+    ## <ins>Mayotte</ins>
+  </script>
+
+  <script type="text/markdown">
+    À ces chiffres s’ajoutent ceux de personnes qui perdent la vie en tentant de rejoindre Mayotte depuis les Comores ou les îles voisines, affrontant des traversées maritimes périlleuses sur des embarcations souvent surchargées et mal équipées.
+  </script>
+
+  <script type="module" hidden>
+    display(mayotte());
+  </script>
+
+  <script type="text/markdown">
     ## <ins>Conclusion</ins>
   </script>
 
@@ -515,10 +527,14 @@
   DATA LOADING
 
   <script type="module" hidden>
+    let iom = await FileAttachment(
+      "../data/Sources/IOM/Missing_Migrants_Global_Figures_allData.csv",
+    ).csv();
     let all = await FileAttachment("../data/data.csv").csv();
     let missing = await FileAttachment("../data/missing_causes.csv").csv();
-
+    let comores = await FileAttachment("../data/comores.geojson").json();
     let land = await FileAttachment("../data/land.json").json();
+    let world = await FileAttachment("../data/world.json").json();
     let eu = await FileAttachment("../data/eu.json").json();
     let schengen = await FileAttachment("../data/schengen.json").json();
     let toponymes = await FileAttachment("../data/toponymes.json").json();
@@ -917,6 +933,34 @@
   </script>
 
   <script type="module">
+    function getTextMayotte(geojson) {
+      if (!geojson || !geojson.features || geojson.features.length === 0) {
+        return "";
+      }
+      const features = geojson.features;
+      const total = features.reduce((sum, f) => {
+        return sum + (Number(f.properties.total) || 0);
+      }, 0);
+      const dates = features
+        .map((f) => new Date(f.properties.date))
+        .filter((d) => !isNaN(d));
+      const minDate = new Date(Math.min(...dates));
+      const maxDate = new Date(Math.max(...dates));
+      const formatDate = (d) =>
+        d.toLocaleDateString("fr-FR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      const personnes =
+        total > 1 ? "personnes sont mortes" : "personne est morte";
+      return `Selon l'OIM, au moins ${total} personnes \n sont mortes en migration dans l'archipel\ndes Comores, du ${formatDate(
+        minDate,
+      )}\nau ${formatDate(maxDate)}`;
+    }
+  </script>
+
+  <script type="module">
     function preview({ path, title, author = "Observable", thumbnail }) {
       return htl.html`<a href="${encodeURI(
         path,
@@ -939,6 +983,272 @@
       return htl.html`<div style="display: grid; grid-gap: .875rem; grid-template-columns: repeat(auto-fill, minmax(${size}px, 5fr));">${notebooks.map(
         preview,
       )}</div>`;
+    }
+  </script>
+
+  <script type="module">
+    function mayotte() {
+      // CONTAINER
+      let svg = viz.create({
+        width: 1000,
+        responsive: true,
+        projection: "mercator",
+        domain: comores,
+        margin: 50,
+        background: "#bde1f0",
+      });
+
+      // DATA WRANGLING
+      let data = iom.map((d) => {
+        const [lat, lng] = d.Coordinates
+          ? d.Coordinates.split(",").map((v) => parseFloat(v.trim()))
+          : [null, null];
+
+        return {
+          id: d["Main.ID"],
+          date: d["Incident.Date"],
+          year: d["Incident.Year"],
+          total: Number(d["Total.Number.of.Dead.and.Missing"]),
+          lat,
+          lng,
+        };
+      });
+
+      let check = new Map(
+        viz.tool
+          .project(
+            viz.tool.featurecollection(data, { lat: "lat", lon: "lng" }),
+            {
+              projection: svg.projection,
+            },
+          )
+          .features.map((d) => [d.properties.id, d.geometry?.coordinates]),
+      );
+
+      let missing_migrants = viz.tool.featurecollection(
+        data.filter((d) => Array.isArray(check.get(d.id))),
+        { latitude: "lat", longitude: "lng" },
+      );
+
+      let labels = [
+        {
+          label: "Mayotte",
+          coords: [45.154333935370474, -12.824461606121108],
+          fontSize: 15,
+          fontWeight: "bold",
+        },
+        {
+          label: "Anjouan\n(Ndzouani)",
+          coords: [44.43257310672082, -12.222407904407017],
+        },
+        {
+          label: "Mohéli\n(Moili)",
+          coords: [43.72661382953115, -12.320800692475897],
+        },
+        {
+          label: "Grande Comore\n(Ngazidja)",
+          coords: [43.362870725257835, -11.764198172880416],
+        },
+      ];
+
+      // MAIN MAP
+      svg.graticule({ stroke: "white", step: 0.5 });
+      svg.path({
+        data: comores,
+        fill: (d) => (d.properties["CNTR_ID"] == "FR" ? "#facc37" : "white"),
+      });
+      svg.scalebar({ label: "kilomètres" });
+
+      let dots = viz.tool.replicate(missing_migrants, {
+        field: "total",
+        targetvalue: 1,
+      });
+
+      svg.circle({
+        data: dots,
+        r: 4,
+        fill: "#e3325b",
+        dodge: true,
+      });
+
+      svg
+        .selectAll("circle")
+        .data(dots)
+        .attr("class", (d) => `dot dot-${d.properties.year}`);
+
+      labels.forEach((d) => {
+        svg.text({
+          pos: d.coords,
+          coords: "geo",
+          text: d.label,
+          fontSize: d.fontSize || 10,
+          fill: d.fill || "#3b3b3b",
+          fontWeight: d.fontWeight || "normal",
+        });
+      });
+
+      const txt = getTextMayotte(missing_migrants);
+      svg.text({
+        pos: [201, 56],
+        text: `${txt}`,
+        fontSize: 35,
+        fontWeight: "bold",
+        fill: "#808080",
+        stroke: "#BDE1F0",
+        strokeWidth: 0,
+      });
+      svg.text({
+        pos: [200, 55],
+        text: `${txt}`,
+        fontSize: 35,
+        fontWeight: "bold",
+        fill: "white",
+        stroke: "#BDE1F0",
+        strokeWidth: 0,
+      });
+
+      svg.text({
+        pos: [svg.width - 10, svg.height - 20],
+        fontSize: 8,
+        fill: "white",
+        textAnchor: "end",
+        text: "Nicolas Lambert, 2026\nSource : Organisation internationale pour les migrations (OIM)",
+      });
+
+      // INSET
+
+      let inset = viz.container.create({
+        parent: svg,
+        pos: [700, 210],
+        width: 200,
+        projection: `Orthographic.rotate([-45.154333935370474, 12.824461606121108])`,
+      });
+
+      inset.outline({ fill: "#bde1f0" });
+      inset.path({ datum: world, fill: "white", fillOpacity: 0.5 });
+      inset.outline({ fill: "none", stroke: "white", strokeWidth: 3 });
+      inset.square({
+        coords: "geo",
+        pos: labels[0].coords,
+        side: 5,
+        fill: "none",
+        stroke: "black",
+      });
+
+      inset.text({
+        coords: "geo",
+        pos: labels[0].coords,
+        text: "Archipel\ndes Comores",
+        dy: -17,
+        fill: "#3b3b3b",
+        fontSize: 10,
+      });
+
+      // CHART
+      const sumByYear = d3.rollups(
+        missing_migrants.features.map((d) => d.properties),
+        (v) => d3.sum(v, (d) => +d.total),
+        (d) => d.year,
+      );
+
+      sumByYear.sort((a, b) => +a[0] - +b[0]);
+
+      const chartWidth = 400;
+      const chartHeight = 200;
+      const margin = { top: 10, right: 10, bottom: 30, left: 40 };
+
+      const chart = svg.append("g").attr("transform", "translate(70, 570)");
+
+      const x = d3
+        .scaleBand()
+        .domain(sumByYear.map((d) => d[0]))
+        .range([margin.left, chartWidth - margin.right])
+        .padding(0.1);
+
+      const y = d3
+        .scaleLinear()
+        .domain([0, d3.max(sumByYear, (d) => d[1])])
+        .nice()
+        .range([chartHeight - margin.bottom, margin.top]);
+
+      chart
+        .append("g")
+        .attr("transform", `translate(0, ${chartHeight - margin.bottom})`)
+        .call(d3.axisBottom(x))
+        .call((g) => g.select(".domain").remove()) // optionnel : enlève la ligne de l'axe
+        .call((g) => g.selectAll("text").attr("font-size", 10));
+
+      chart
+        .append("g")
+        .attr("transform", `translate(${margin.left}, 0)`)
+        .call(d3.axisLeft(y).ticks(5))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.selectAll("text").attr("font-size", 10));
+      chart
+        .selectAll("rect")
+        .data(sumByYear)
+        .join("rect")
+        .attr("class", (d) => `bar bar-${d[0]}`)
+        .attr("x", (d) => x(d[0]))
+        .attr("y", (d) => y(d[1]))
+        .attr("width", x.bandwidth())
+        .attr("height", (d) => y(0) - y(d[1]))
+        .attr("fill", "#e3325b");
+      chart
+        .selectAll("text.bar-label")
+        .data(sumByYear)
+        .join("text")
+        .attr("class", "bar-label")
+        .attr("x", (d) => x(d[0]) + x.bandwidth() / 2)
+        .attr("y", (d) => y(d[1]) - 5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", 10)
+        .text((d) => d3.format(",")(d[1])); // formatage 1,234
+
+      // INTERACTIONS
+
+      chart
+        .selectAll("rect")
+        .on("mouseover", function (event, d) {
+          const year = d[0];
+          chart
+            .selectAll("rect")
+            .attr("fill", (bar) => (bar[0] === year ? "#e3325b" : "#ccc"));
+          svg
+            .selectAll("circle")
+            .attr("fill", (dot) =>
+              dot.properties.year === year ? "#e3325b" : "#ccc",
+            );
+        })
+        .on("mouseout", function () {
+          chart.selectAll("rect").attr("fill", "#e3325b");
+          svg.selectAll("circle").attr("fill", "#e3325b");
+        });
+
+      svg
+        .selectAll("circle")
+        .on("mouseover", function (event, d) {
+          const year = d.properties.year;
+
+          // Colorer la barre correspondante et griser les autres
+          chart
+            .selectAll("rect")
+            .attr("fill", (bar) => (bar[0] === year ? "#e3325b" : "#ccc"));
+
+          // Colorer ce cercle et griser les autres
+          svg
+            .selectAll("circle")
+            .attr("fill", (dot) =>
+              dot.properties.year === year ? "#e3325b" : "#ccc",
+            );
+        })
+        .on("mouseout", function () {
+          // Reset couleur
+          chart.selectAll("rect").attr("fill", "#e3325b");
+          svg.selectAll("circle").attr("fill", "#e3325b");
+        });
+
+      return svg.render();
     }
   </script>
 </notebook>
