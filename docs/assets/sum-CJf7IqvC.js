@@ -1,0 +1,1 @@
+function l(i,t){let n;if(t===void 0)for(const e of i)e!=null&&(n<e||n===void 0&&e>=e)&&(n=e);else{let e=-1;for(let f of i)(f=t(f,++e,i))!=null&&(n<f||n===void 0&&f>=f)&&(n=f)}return n}function d(i,t){let n=0;if(t===void 0)for(let e of i)(e=+e)&&(n+=e);else{let e=-1;for(let f of i)(f=+t(f,++e,i))&&(n+=f)}return n}export{l as m,d as s};
