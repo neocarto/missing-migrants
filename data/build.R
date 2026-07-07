@@ -17,7 +17,6 @@ united <- data.frame(
 
 migrantsfile <- read.csv("../data/Sources/TheMigrantsFile/DISCONTINUED ON JUNE 24, 2016 - Events during which someone died trying to reach or stay in Europe - Events.csv")
 migrantsfile[migrantsfile$latitude == 26.3351 & migrantsfile$longitude == 17.228331, c("latitude", "longitude")] <- c(30, 17.228331) # patch
-head(migrantsfile)
 migrantsfile <- data.frame(
   year  = as.integer(migrantsfile$Year),
   cause = migrantsfile$cause_of_death,
@@ -32,14 +31,20 @@ migrantsfile <- migrantsfile[migrantsfile$year < 2014 & !is.na(migrantsfile$year
 
 source("../data/Sources/IOM/download.R") # download
 iom <- read.csv("../data/Sources/IOM/Missing_Migrants_Global_Figures_allData.csv")
-coords <- do.call(rbind, strsplit(iom$Coordinates, ","))
+tmp <- strsplit(iom$Coordinates, ",")
+lat <- lng <- rep(NA_real_, length(tmp))
+ok <- lengths(tmp) == 2
+lat[ok] <- as.numeric(trimws(sapply(tmp[ok], `[`, 1)))
+lng[ok] <- as.numeric(trimws(sapply(tmp[ok], `[`, 2)))
+
 iom <- data.frame(
-  year  = as.integer(iom$`Incident.Year`),
-  cause = iom$`Cause.of.Death`,
-  lat   = as.numeric(coords[, 1]),
-  lng   = as.numeric(coords[, 2]),
-  nb    = as.integer(iom$`Total.Number.of.Dead.and.Missing`)
+  year  = as.integer(iom$Incident.Year),
+  cause = iom$Cause.of.Death,
+  lat   = lat,
+  lng   = lng,
+  nb    = as.integer(iom$Total.Number.of.Dead.and.Missing)
 )
+
 iom <- iom[iom$nb > 0, ]
 
 # Merge all data
